@@ -12,20 +12,18 @@ import {
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// SiliconFlow image generation endpoint (OpenAI-compatible)
-const SF_ENDPOINT = 'https://api.siliconflow.cn/v1/images/generations';
-const SF_MODEL = 'black-forest-labs/FLUX.1-schnell'; // free tier on SiliconFlow
+// fal.ai sync REST endpoint — no SDK needed.
+const FAL_ENDPOINT = 'https://fal.run/fal-ai/flux/schnell';
 
-type SfResponse = {
-  images?: { url: string }[];
-  data?: { url: string }[];
+type FalResponse = {
+  images?: { url: string; width?: number; height?: number }[];
 };
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.SILICONFLOW_KEY;
+  const apiKey = process.env.FAL_KEY;
   if (!apiKey) {
     return NextResponse.json(
-      { error: 'Server is not configured (missing SILICONFLOW_KEY).' },
+      { error: 'Server is not configured (missing FAL_KEY).' },
       { status: 500 }
     );
   }
@@ -72,35 +70,32 @@ export async function POST(req: NextRequest) {
   const fullPrompt = buildColoringPrompt(prompt, style);
 
   try {
-    // FLUX.1-schnell on SiliconFlow uses a fixed step count (4) — do NOT send num_inference_steps.
-    const sfRes = await fetch(SF_ENDPOINT, {
+    const falRes = await fetch(FAL_ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Key ${apiKey}`,
       },
       body: JSON.stringify({
-        model: SF_MODEL,
         prompt: fullPrompt,
-        image_size: '1024x1024',
-        batch_size: 1,
+        image_size: 'square_hd',
+        num_inference_steps: 4,
+        num_images: 1,
+        enable_safety_checker: true,
       }),
     });
 
-    if (!sfRes.ok) {
-      const txt = await sfRes.text();
-      console.error('SiliconFlow error', sfRes.status, txt);
-      // Surface upstream error for debugging — safe to show, contains no secrets.
+    if (!falRes.ok) {
+      const txt = await falRes.text();
+      console.error('fal.ai error', falRes.status, txt);
       return NextResponse.json(
-        {
-          error: `AI generation failed (${sfRes.status}). ${txt.slice(0, 300)}`,
-        },
+        { error: `AI generation failed (${falRes.status}). ${txt.slice(0, 300)}` },
         { status: 502 }
       );
     }
 
-    const data = (await sfRes.json()) as SfResponse;
-    const imageUrl = data.images?.[0]?.url || data.data?.[0]?.url;
+    const data = (await falRes.json()) as FalResponse;
+    const imageUrl = data.images?.[0]?.url;
     if (!imageUrl) {
       return NextResponse.json({ error: 'Generation returned no image.' }, { status: 502 });
     }
@@ -114,7 +109,7 @@ export async function POST(req: NextRequest) {
       remaining: remainingFromCount(newCount),
     });
   } catch (err) {
-    console.error('SiliconFlow request failed', err);
+    console.error('fal.ai request failed', err);
     return NextResponse.json(
       { error: 'AI generation failed. Please try again.' },
       { status: 502 }
