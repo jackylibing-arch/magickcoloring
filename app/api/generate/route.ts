@@ -72,6 +72,7 @@ export async function POST(req: NextRequest) {
   const fullPrompt = buildColoringPrompt(prompt, style);
 
   try {
+    // FLUX.1-schnell on SiliconFlow uses a fixed step count (4) — do NOT send num_inference_steps.
     const sfRes = await fetch(SF_ENDPOINT, {
       method: 'POST',
       headers: {
@@ -82,7 +83,6 @@ export async function POST(req: NextRequest) {
         model: SF_MODEL,
         prompt: fullPrompt,
         image_size: '1024x1024',
-        num_inference_steps: 4,
         batch_size: 1,
       }),
     });
@@ -90,8 +90,11 @@ export async function POST(req: NextRequest) {
     if (!sfRes.ok) {
       const txt = await sfRes.text();
       console.error('SiliconFlow error', sfRes.status, txt);
+      // Surface upstream error for debugging — safe to show, contains no secrets.
       return NextResponse.json(
-        { error: 'AI generation failed. Please try again.' },
+        {
+          error: `AI generation failed (${sfRes.status}). ${txt.slice(0, 300)}`,
+        },
         { status: 502 }
       );
     }
