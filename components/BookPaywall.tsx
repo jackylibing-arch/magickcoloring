@@ -38,32 +38,38 @@ export default function BookPaywall({
 
   return (
     <div className="card p-8 bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-orange-200">
-      <h2 className="text-2xl md:text-3xl font-bold text-center mb-3">
-        Unlock {childName}'s Full Coloring Storybook
+      <h2 className="text-2xl md:text-3xl font-bold text-center mb-2">
+        Unlock {childName}'s Full Storybook
       </h2>
       <p className="text-center text-gray-700 mb-6">
-        Get all {totalPages} pages — instantly downloadable, ready to print.
+        {totalPages} pages · Printable PDF · Personalized story
       </p>
 
       <ul className="max-w-md mx-auto space-y-2 mb-6 text-gray-800">
-        <li className="flex items-center gap-2">
-          <span className="text-brand-600">✓</span> {totalPages}-page printable PDF
+        <li className="flex items-start gap-2">
+          <span className="text-brand-600 mt-1">✓</span>
+          <span>All <strong>{totalPages} pages</strong> of {childName}'s personalized story</span>
         </li>
-        <li className="flex items-center gap-2">
-          <span className="text-brand-600">✓</span> {childName}'s name on the cover and every page
+        <li className="flex items-start gap-2">
+          <span className="text-brand-600 mt-1">✓</span>
+          <span>High-resolution, letter-size <strong>print-ready PDF</strong></span>
         </li>
-        <li className="flex items-center gap-2">
-          <span className="text-brand-600">✓</span> High-resolution, letter-size, print-ready
+        <li className="flex items-start gap-2">
+          <span className="text-brand-600 mt-1">✓</span>
+          <span>Instant download — no shipping, no waiting</span>
         </li>
-        <li className="flex items-center gap-2">
-          <span className="text-brand-600">✓</span> Free for personal & classroom use
+        <li className="flex items-start gap-2">
+          <span className="text-brand-600 mt-1">✓</span>
+          <span>Free for personal &amp; classroom use</span>
         </li>
       </ul>
 
-      <div className="text-center mb-4">
+      <div className="text-center mb-5">
         <span className="text-gray-400 line-through text-lg mr-2">$12.00</span>
         <span className="text-4xl font-extrabold text-brand-700">$5.90</span>
-        <span className="text-sm text-gray-500 ml-2">limited launch price</span>
+        <div className="text-xs text-orange-700 font-semibold mt-1 uppercase tracking-wide">
+          Limited launch price
+        </div>
       </div>
 
       {error && (
@@ -78,12 +84,14 @@ export default function BookPaywall({
         disabled={loading}
         className="btn-primary w-full text-lg py-4"
       >
-        {loading ? 'Redirecting to checkout…' : '🎨 Unlock Full Book — $5.90'}
+        {loading ? 'Redirecting to checkout…' : `🎨 Unlock Full Storybook — $5.90`}
       </button>
 
-      <p className="text-center text-xs text-gray-500 mt-4">
-        Secure checkout via Stripe · Instant download after payment
-      </p>
+      <div className="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-600">
+        <span className="flex items-center gap-1">🔒 Secure Stripe checkout</span>
+        <span className="flex items-center gap-1">⚡ Instant download</span>
+        <span className="flex items-center gap-1">💳 No subscription</span>
+      </div>
     </div>
   );
 }

@@ -81,18 +81,26 @@ export default function Home() {
 
       {/* Hero with form right inside */}
       <section className="mx-auto max-w-5xl px-4 pt-10 pb-2 text-center">
+        <div className="inline-flex items-center gap-2 rounded-full bg-orange-100 border border-orange-200 px-3 py-1 text-xs font-semibold text-orange-800 mb-4">
+          ⚡ New · Personalized in 10 seconds
+        </div>
         <h1 className="font-display text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
-          Make a Personalized <span className="text-brand-600">Coloring Storybook</span> Starring Your Child
+          Create a Personalized <span className="text-brand-600">Coloring Storybook</span> with Your Child's Name in 10 Seconds
         </h1>
         <p className="mt-5 text-lg md:text-xl text-gray-700 max-w-2xl mx-auto">
-          A printable 20-page adventure where your child is the hero. Their name on every page.
-          Free preview · From $5.90.
+          A 20-page printable adventure where your child is the hero of the story.
+          See a free preview before you pay — from <strong>$5.90</strong>.
         </p>
         <div className="mt-5 flex flex-wrap justify-center gap-3 text-sm text-gray-600">
           <span className="rounded-full bg-white border border-orange-200 px-3 py-1">📖 20 pages</span>
           <span className="rounded-full bg-white border border-orange-200 px-3 py-1">🖨 Print at home</span>
           <span className="rounded-full bg-white border border-orange-200 px-3 py-1">🧒 Ages 3-10</span>
           <span className="rounded-full bg-white border border-orange-200 px-3 py-1">⚡ Instant preview</span>
+        </div>
+        <div className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-1 text-xs text-gray-500">
+          <span>🔒 Secure Stripe checkout</span>
+          <span>💳 No subscription</span>
+          <span>↩️ 100% free preview</span>
         </div>
       </section>
 
