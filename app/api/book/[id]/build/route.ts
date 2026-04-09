@@ -6,10 +6,8 @@
 // returns generating (avoids duplicate work — best-effort, not locked).
 
 import { NextRequest, NextResponse } from 'next/server';
-import { put } from '@vercel/blob';
 import { getBook, updateBook } from '@/lib/bookStore';
 import { generateColoringImage, buildBookPagePrompt } from '@/lib/falImage';
-import { renderBookPdf } from '@/lib/pdfBook';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -23,8 +21,8 @@ export async function POST(_req: NextRequest, { params }: { params: { id: string
   if (!book.paid) {
     return NextResponse.json({ error: 'Book not paid.' }, { status: 402 });
   }
-  if (book.status === 'ready' && book.pdfUrl) {
-    return NextResponse.json({ status: 'ready', pdfUrl: book.pdfUrl });
+  if (book.status === 'ready') {
+    return NextResponse.json({ status: 'ready', pdfUrl: `/api/book/${book.id}/pdf` });
   }
 
   // Mark generating (no real lock, best-effort).
@@ -54,28 +52,15 @@ export async function POST(_req: NextRequest, { params }: { params: { id: string
     for (const { i, url } of generated) {
       updatedImageUrls[i] = url;
     }
-    const filledBook = { ...book, pageImageUrls: updatedImageUrls };
 
-    // 2. Render PDF.
-    const pdfBuffer = await renderBookPdf(filledBook);
-
-    // 3. Upload to Vercel Blob.
-    const blobName = `books/${book.id}/${book.childName.replace(/[^a-zA-Z0-9]/g, '_')}-coloring-book.pdf`;
-    const { url: pdfUrl } = await put(blobName, pdfBuffer, {
-      access: 'public',
-      contentType: 'application/pdf',
-      addRandomSuffix: false,
-      allowOverwrite: true,
-    });
-
-    // 4. Save final book state.
+    // 2. Save final book state — image URLs only. PDF is rendered on demand
+    //    by /api/book/[id]/pdf using these cached fal.ai URLs.
     await updateBook(book.id, {
       pageImageUrls: updatedImageUrls,
-      pdfUrl,
       status: 'ready',
     });
 
-    return NextResponse.json({ status: 'ready', pdfUrl });
+    return NextResponse.json({ status: 'ready', pdfUrl: `/api/book/${book.id}/pdf` });
   } catch (err: any) {
     console.error('book build failed', err);
     await updateBook(book.id, { status: 'error', error: err.message || 'unknown' });

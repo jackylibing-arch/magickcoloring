@@ -118,7 +118,7 @@ export default function BookSuccessClient({ bookId }: { bookId: string }) {
             Click below to download the PDF. Print it at home and hand it to your kid 🧡
           </p>
           <a
-            href={pdfUrl ?? `/api/book/${bookId}/build`}
+            href={pdfUrl ?? `/api/book/${bookId}/pdf`}
             target="_blank"
             rel="noreferrer"
             className="btn-primary text-lg px-8 py-4 inline-block"

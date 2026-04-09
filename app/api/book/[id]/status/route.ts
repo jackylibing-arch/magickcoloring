@@ -23,7 +23,7 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
       filled: filledCount,
       total: book.pageImageUrls.length,
     },
-    pdfReady: Boolean(book.pdfUrl),
+    pdfReady: book.status === 'ready',
     error: book.error,
   });
 }
