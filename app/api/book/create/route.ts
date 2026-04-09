@@ -17,6 +17,8 @@ import { isPromptSafe } from '@/lib/prompt';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+export const revalidate = 0;
 export const maxDuration = 60; // need ~30s for 3 image generations
 
 const VALID_THEMES = new Set(THEMES.map((t) => t.id));

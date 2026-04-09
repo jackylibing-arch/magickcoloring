@@ -6,6 +6,8 @@ import { getBook } from '@/lib/bookStore';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+export const revalidate = 0;
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
   const book = await getBook(params.id);

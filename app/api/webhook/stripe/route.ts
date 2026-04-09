@@ -10,6 +10,8 @@ import { SITE } from '@/lib/site';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+export const revalidate = 0;
 
 export async function POST(req: NextRequest) {
   const signature = req.headers.get('stripe-signature');

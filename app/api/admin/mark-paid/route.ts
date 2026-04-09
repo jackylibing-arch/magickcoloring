@@ -8,6 +8,8 @@ import { generateColoringImage, buildBookPagePrompt } from '@/lib/falImage';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+export const revalidate = 0;
 export const maxDuration = 60;
 
 const ROUTE_VERSION = 'v4-direct-kv-2026-04-09';
