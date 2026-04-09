@@ -31,18 +31,24 @@ export async function POST(_req: NextRequest, { params }: { params: { id: string
   await updateBook(book.id, { status: 'generating' });
 
   try {
-    // 1. Generate all missing page images in parallel.
+    // 1. Generate all missing page images, throttled to fal.ai concurrency limit (10).
     const missingIndices = book.pageImageUrls
       .map((u, i) => (u === null ? i : -1))
       .filter((i) => i >= 0);
 
-    const generated = await Promise.all(
-      missingIndices.map(async (i) => {
-        const prompt = buildBookPagePrompt(book.story[i].scene);
-        const url = await generateColoringImage(prompt);
-        return { i, url };
-      })
-    );
+    const CONCURRENCY = 6;
+    const generated: { i: number; url: string }[] = [];
+    for (let start = 0; start < missingIndices.length; start += CONCURRENCY) {
+      const batch = missingIndices.slice(start, start + CONCURRENCY);
+      const batchResults = await Promise.all(
+        batch.map(async (i) => {
+          const prompt = buildBookPagePrompt(book.story[i].scene);
+          const url = await generateColoringImage(prompt);
+          return { i, url };
+        })
+      );
+      generated.push(...batchResults);
+    }
 
     const updatedImageUrls = [...book.pageImageUrls];
     for (const { i, url } of generated) {
