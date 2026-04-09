@@ -10,6 +10,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
+const ROUTE_VERSION = 'v3-kv-only-2026-04-09';
+
 export async function POST(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get('id');
@@ -66,6 +68,7 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({
     ok: true,
+    routeVersion: ROUTE_VERSION,
     id,
     before: { paid: book.paid, status: book.status, filled: book.pageImageUrls.filter(Boolean).length },
     after: {
