@@ -47,16 +47,37 @@ export default function Generator() {
     'cute puppy playing with a ball',
     'underwater castle with mermaids',
     'space rocket flying past planets',
+    'a dragon with butterfly wings',
+    'a cat sitting in a teacup',
+    'a fire truck with a dalmatian',
+    'an owl with detailed patterned feathers',
+    'a robot watering flowers',
+    'a turtle wearing a wizard hat',
+    'a panda eating bamboo on a cloud',
   ];
+
+  function surpriseMe() {
+    const next = examples[Math.floor(Math.random() * examples.length)];
+    setPrompt(next);
+  }
 
   return (
     <section id="generator" className="mx-auto max-w-6xl px-4 py-10">
       <div className="card p-6 md:p-8">
         <form onSubmit={handleGenerate} className="space-y-5">
           <div>
-            <label className="block text-sm font-semibold text-gray-800 mb-2">
-              Describe your coloring page
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-semibold text-gray-800">
+                Describe your coloring page
+              </label>
+              <button
+                type="button"
+                onClick={surpriseMe}
+                className="text-xs font-medium text-brand-700 hover:text-brand-800"
+              >
+                🎲 Surprise me
+              </button>
+            </div>
             <input
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
@@ -129,7 +150,7 @@ export default function Generator() {
 
           {state === 'done' && imageUrl && (
             <div className="space-y-4">
-              <div className="mx-auto max-w-md">
+              <div className="mx-auto max-w-md print-area">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={imageUrl}

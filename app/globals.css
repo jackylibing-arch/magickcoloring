@@ -21,3 +21,31 @@ html, body {
 .card {
   @apply rounded-2xl border border-orange-100 bg-white shadow-sm;
 }
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  .print-area, .print-area * {
+    visibility: visible !important;
+  }
+  .print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    background: white !important;
+  }
+  .print-area img {
+    max-width: 100%;
+    height: auto;
+    border: none !important;
+    border-radius: 0 !important;
+    page-break-inside: avoid;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
