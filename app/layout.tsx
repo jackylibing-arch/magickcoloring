@@ -76,9 +76,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               ✨ {SITE.name}
             </a>
             <nav className="flex gap-5 text-sm font-medium text-gray-700">
-              <a href="/#generator" className="hover:text-brand-600">Generator</a>
+              <a href="/" className="hover:text-brand-600">Create Book</a>
+              <a href="/free-tool" className="hover:text-brand-600">Free Tool</a>
               <a href="/blog" className="hover:text-brand-600">Blog</a>
-              <a href="/#how" className="hover:text-brand-600">How it works</a>
             </nav>
           </div>
         </header>
