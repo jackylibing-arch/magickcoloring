@@ -78,6 +78,14 @@ export async function POST(req: NextRequest) {
     ok: true,
     routeVersion: ROUTE_VERSION,
     id,
+    diag: {
+      kvUrlHost: process.env.KV_REST_API_URL
+        ? new URL(process.env.KV_REST_API_URL).host
+        : null,
+      kvTokenLast4: process.env.KV_REST_API_TOKEN?.slice(-4) ?? null,
+      vercelEnv: process.env.VERCEL_ENV,
+      lambdaId: Math.random().toString(36).slice(2, 8),
+    },
     before: {
       paid: book.paid,
       status: book.status,
