@@ -1,5 +1,7 @@
-// Book metadata storage backed by Vercel KV.
-// Falls back to in-memory Map for local dev when KV is not configured.
+// Book metadata storage backed by Vercel KV (Upstash Redis).
+// KV-only — no in-memory fallback. We had a critical bug where warm lambdas
+// without KV env vars silently used a private in-memory Map, causing
+// per-lambda state divergence in production. Fail loud instead.
 
 import { kv } from '@vercel/kv';
 import type { Theme, StoryPage } from './templates';
@@ -30,25 +32,23 @@ export type Book = {
 };
 
 const KV_PREFIX = 'book:';
-const memStore = new Map<string, Book>();
 
-function hasKV(): boolean {
-  return Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
+function assertKv(): void {
+  if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
+    throw new Error(
+      'KV not configured: missing KV_REST_API_URL or KV_REST_API_TOKEN env var.'
+    );
+  }
 }
 
 export async function saveBook(book: Book): Promise<void> {
-  if (hasKV()) {
-    await kv.set(KV_PREFIX + book.id, book, { ex: 60 * 60 * 24 * 30 }); // 30 days
-  } else {
-    memStore.set(book.id, book);
-  }
+  assertKv();
+  await kv.set(KV_PREFIX + book.id, book, { ex: 60 * 60 * 24 * 30 }); // 30 days
 }
 
 export async function getBook(id: string): Promise<Book | null> {
-  if (hasKV()) {
-    return (await kv.get<Book>(KV_PREFIX + id)) ?? null;
-  }
-  return memStore.get(id) ?? null;
+  assertKv();
+  return (await kv.get<Book>(KV_PREFIX + id)) ?? null;
 }
 
 export async function updateBook(
