@@ -3,14 +3,16 @@
 // webhook fails to update KV. Guarded by ADMIN_TOKEN env var.
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getBook, updateBook } from '@/lib/bookStore';
+import { kv } from '@vercel/kv';
 import { generateColoringImage, buildBookPagePrompt } from '@/lib/falImage';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-const ROUTE_VERSION = 'v3-kv-only-2026-04-09';
+const ROUTE_VERSION = 'v4-direct-kv-2026-04-09';
+const KEY = (id: string) => `book:${id}`;
+const TTL = 60 * 60 * 24 * 30;
 
 export async function POST(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -28,14 +30,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing id query param.' }, { status: 400 });
   }
 
-  const book = await getBook(id);
+  // Direct KV access — bypassing bookStore module to rule out any
+  // bundle/cache issue with that module.
+  const book: any = await kv.get(KEY(id));
   if (!book) {
     return NextResponse.json({ error: 'Book not found.' }, { status: 404 });
   }
 
-  // Atomic recovery: mark paid + generate missing images + mark ready,
-  // all in this single request. No fire-and-forget, no client involvement.
-  await updateBook(id, { paid: true, status: 'generating' });
+  // Atomic recovery: mark paid + generate missing images + mark ready.
+  await kv.set(KEY(id), { ...book, paid: true, status: 'generating' }, { ex: TTL });
 
   const missingIndices = book.pageImageUrls
     .map((u, i) => (u === null ? i : -1))
@@ -60,21 +63,30 @@ export async function POST(req: NextRequest) {
     updatedImageUrls[i] = url;
   }
 
-  const finalBook = await updateBook(id, {
+  const finalBook = {
+    ...book,
     paid: true,
     pageImageUrls: updatedImageUrls,
     status: 'ready',
-  });
+  };
+  await kv.set(KEY(id), finalBook, { ex: TTL });
+
+  // Read it back to confirm KV persistence (not just local memory).
+  const verify: any = await kv.get(KEY(id));
 
   return NextResponse.json({
     ok: true,
     routeVersion: ROUTE_VERSION,
     id,
-    before: { paid: book.paid, status: book.status, filled: book.pageImageUrls.filter(Boolean).length },
-    after: {
-      paid: finalBook?.paid,
-      status: finalBook?.status,
-      filled: finalBook?.pageImageUrls.filter(Boolean).length,
+    before: {
+      paid: book.paid,
+      status: book.status,
+      filled: book.pageImageUrls.filter(Boolean).length,
+    },
+    verifyAfterRead: {
+      paid: verify?.paid,
+      status: verify?.status,
+      filled: verify?.pageImageUrls?.filter(Boolean).length,
     },
   });
 }
