@@ -40,9 +40,9 @@ export async function POST(req: NextRequest) {
   // Atomic recovery: mark paid + generate missing images + mark ready.
   await kv.set(KEY(id), { ...book, paid: true, status: 'generating' }, { ex: TTL });
 
-  const missingIndices = book.pageImageUrls
-    .map((u, i) => (u === null ? i : -1))
-    .filter((i) => i >= 0);
+  const missingIndices = (book.pageImageUrls as (string | null)[])
+    .map((u: string | null, i: number) => (u === null ? i : -1))
+    .filter((i: number) => i >= 0);
 
   const generated: { i: number; url: string }[] = [];
   const CONCURRENCY = 6;
