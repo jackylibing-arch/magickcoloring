@@ -6,7 +6,7 @@ export const SITE = {
   description:
     'Turn any idea into a printable coloring page in seconds. Free AI coloring page generator — no signup, instant download, kid-safe line art.',
   twitter: '@magickcoloring',
-  freeDailyLimit: 5,
+  freeDailyLimit: 3,
 } as const;
 
 export const STYLES = [

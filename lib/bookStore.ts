@@ -43,7 +43,10 @@ function assertKv(): void {
 
 export async function saveBook(book: Book): Promise<void> {
   assertKv();
-  await kv.set(KV_PREFIX + book.id, book, { ex: 60 * 60 * 24 * 30 }); // 30 days
+  // Unpaid previews expire in 24h (cheap cleanup for abandoned/abusive flows).
+  // Once paid, extend to 30 days so the customer can re-download their PDF.
+  const ttlSeconds = book.paid ? 60 * 60 * 24 * 30 : 60 * 60 * 24;
+  await kv.set(KV_PREFIX + book.id, book, { ex: ttlSeconds });
 }
 
 export async function getBook(id: string): Promise<Book | null> {

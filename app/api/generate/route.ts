@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildColoringPrompt, isPromptSafe } from '@/lib/prompt';
 import { SITE, type StyleId } from '@/lib/site';
-import {
-  bumpIpUsage,
-  getIpUsage,
-  readCookieUsage,
-  remainingFromCount,
-  writeCookieUsage,
-} from '@/lib/rateLimit';
+import { checkAndBump, getIp, writeCookieUsage } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -48,19 +42,14 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Rate limit (cookie + IP)
-  const cookieCount = readCookieUsage();
-  const ip =
-    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    req.headers.get('x-real-ip') ||
-    'unknown';
-  const ipCount = getIpUsage(ip);
-  const used = Math.max(cookieCount, ipCount);
-
-  if (used >= SITE.freeDailyLimit) {
+  // Rate limit: KV-backed, atomic per-IP per-day.
+  // This is the single source of truth — cookies are UX-only.
+  const ip = getIp(req);
+  const { allowed, count, remaining } = await checkAndBump('gen', ip);
+  if (!allowed) {
     return NextResponse.json(
       {
-        error: `Daily free limit reached (${SITE.freeDailyLimit}/day). Come back tomorrow or upgrade to Pro (coming soon).`,
+        error: `Daily free limit reached (${SITE.freeDailyLimit}/day). Come back tomorrow, or try our Personalized Coloring Book.`,
         remaining: 0,
       },
       { status: 429 }
@@ -100,13 +89,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Generation returned no image.' }, { status: 502 });
     }
 
-    const newCount = used + 1;
-    writeCookieUsage(newCount);
-    bumpIpUsage(ip);
+    // Cookie is UI-only; KV already incremented in checkAndBump above.
+    writeCookieUsage(count);
 
     return NextResponse.json({
       imageUrl,
-      remaining: remainingFromCount(newCount),
+      remaining,
     });
   } catch (err) {
     console.error('fal.ai request failed', err);

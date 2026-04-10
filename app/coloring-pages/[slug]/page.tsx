@@ -130,6 +130,15 @@ export default async function ColoringPagesSlug({
             </p>
           </div>
         ) : (
+          <>
+          <div className="mb-5 flex justify-center">
+            <a
+              href={`/api/coloring-pages/${slug.slug}/zip`}
+              className="btn-primary inline-flex items-center gap-2"
+            >
+              📦 Download all {images.length} as ZIP
+            </a>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {images.map((url, i) => (
               <div key={url} className="card p-3 flex flex-col">
@@ -152,6 +161,7 @@ export default async function ColoringPagesSlug({
               </div>
             ))}
           </div>
+          </>
         )}
       </section>
 

@@ -18,6 +18,7 @@ import {
 import { saveBook, newBookId, type Book } from '@/lib/bookStore';
 import { isPromptSafe } from '@/lib/prompt';
 import { generatePreviewForBook } from '@/lib/bookPreviewGen';
+import { checkAndBump, getIp } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -52,6 +53,20 @@ export async function POST(req: NextRequest) {
   }
   if (!VALID_THEMES.has(theme)) {
     return NextResponse.json({ error: 'Invalid theme.' }, { status: 400 });
+  }
+
+  // Rate limit: 1 free book preview per IP per day. Each preview costs
+  // 3 fal.ai calls ($0.009), so uncapped this would be a huge bleed.
+  const ip = getIp(req);
+  const { allowed } = await checkAndBump('book', ip);
+  if (!allowed) {
+    return NextResponse.json(
+      {
+        error:
+          "You've already created a free preview today. Come back tomorrow, or purchase your existing book to unlock the full 20-page PDF.",
+      },
+      { status: 429 }
+    );
   }
 
   const story = generateStory(theme, childName, age);
