@@ -38,29 +38,29 @@ export default function BookPaywall({
 
   return (
     <div className="card p-8 bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-orange-200">
-      <h2 className="text-2xl md:text-3xl font-bold text-center mb-2">
-        Unlock {childName}'s Full Storybook
+      <h2 className="text-2xl md:text-3xl font-extrabold text-center mb-2">
+        Unlock {childName}&apos;s Storybook
       </h2>
       <p className="text-center text-gray-700 mb-6">
-        {totalPages} pages · Printable PDF · Personalized story
+        See how {childName}&apos;s adventure ends.
       </p>
 
       <ul className="max-w-md mx-auto space-y-2 mb-6 text-gray-800">
         <li className="flex items-start gap-2">
           <span className="text-brand-600 mt-1">✓</span>
-          <span>All <strong>{totalPages} pages</strong> of {childName}'s personalized story</span>
+          <span><strong>{totalPages} story pages</strong> — full personalized adventure</span>
         </li>
         <li className="flex items-start gap-2">
           <span className="text-brand-600 mt-1">✓</span>
-          <span>High-resolution, letter-size <strong>print-ready PDF</strong></span>
+          <span>Personalized with <strong>{childName}&apos;s name</strong></span>
+        </li>
+        <li className="flex items-start gap-2">
+          <span className="text-brand-600 mt-1">✓</span>
+          <span>High-resolution <strong>printable PDF</strong> — print at home</span>
         </li>
         <li className="flex items-start gap-2">
           <span className="text-brand-600 mt-1">✓</span>
           <span>Instant download — no shipping, no waiting</span>
-        </li>
-        <li className="flex items-start gap-2">
-          <span className="text-brand-600 mt-1">✓</span>
-          <span>Free for personal &amp; classroom use</span>
         </li>
       </ul>
 
@@ -84,7 +84,7 @@ export default function BookPaywall({
         disabled={loading}
         className="btn-primary w-full text-lg py-4"
       >
-        {loading ? 'Redirecting to checkout…' : `🎨 Unlock Full Storybook — $5.90`}
+        {loading ? 'Redirecting to checkout…' : `🎨 Unlock ${childName}'s Storybook — $5.90`}
       </button>
 
       <div className="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-600">

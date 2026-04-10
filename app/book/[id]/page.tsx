@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getBook } from '@/lib/bookStore';
-import { getThemeLabel, getBookTitle } from '@/lib/templates';
+import { getBookTitle } from '@/lib/templates';
 import BookPaywall from '@/components/BookPaywall';
 import BookPreviewImages from '@/components/BookPreviewImages';
 
@@ -51,13 +51,14 @@ export default async function BookPreviewPage({ params }: { params: { id: string
     <div className="mx-auto max-w-4xl px-4 py-10 pb-32">
       <div className="text-center mb-6">
         <p className="text-sm uppercase tracking-wider text-brand-700 font-semibold mb-2">
-          Free Preview · {getThemeLabel(book.theme)}
+          ✨ {book.childName}&apos;s book is ready
         </p>
         <h1 className="font-display text-3xl md:text-4xl font-extrabold text-gray-900">
           {bookTitle}
         </h1>
         <p className="mt-3 text-gray-600">
-          A personalized {totalPages}-page coloring storybook starring {book.childName}.
+          We&apos;ve created the first chapter of {book.childName}&apos;s personalized adventure.
+          Read the free preview below.
         </p>
       </div>
 
@@ -95,16 +96,16 @@ export default async function BookPreviewPage({ params }: { params: { id: string
         <BookPaywall bookId={book.id} childName={book.childName} totalPages={totalPages} />
       </div>
 
-      {/* Sticky bottom CTA (mobile) */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-orange-200 bg-white/95 backdrop-blur-sm shadow-lg md:hidden">
-        <a href="#unlock-cta" className="block px-4 py-3">
+      {/* Sticky bottom CTA — always visible */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-orange-200 bg-white/95 backdrop-blur-sm shadow-2xl">
+        <a href="#unlock-cta" className="block px-4 py-3 max-w-3xl mx-auto">
           <div className="flex items-center justify-between gap-3">
-            <div className="flex flex-col">
+            <div className="flex flex-col flex-shrink-0">
               <span className="text-xs text-gray-500 line-through leading-none">$12.00</span>
               <span className="text-lg font-extrabold text-brand-700 leading-tight">$5.90</span>
             </div>
-            <span className="flex-1 text-center rounded-xl bg-gradient-to-r from-orange-500 to-brand-600 text-white font-bold py-3 text-sm shadow">
-              🎨 Unlock Full Storybook
+            <span className="flex-1 text-center rounded-xl bg-gradient-to-r from-orange-500 to-brand-600 text-white font-bold py-3 px-4 text-sm md:text-base shadow-lg">
+              🎨 Unlock {book.childName}&apos;s Storybook
             </span>
           </div>
         </a>

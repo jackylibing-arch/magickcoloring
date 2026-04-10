@@ -179,31 +179,33 @@ export default function BookPreviewImages({
         )}
       </div>
 
-      {/* Page 3 — locked cliffhanger (always rendered, no image needed) */}
-      <div className="card p-6 mb-6 relative overflow-hidden border-2 border-orange-300 bg-gradient-to-br from-orange-50 to-amber-50">
+      {/* Page 3 — locked cliffhanger (heavy lock, dark overlay) */}
+      <div className="card p-6 mb-6 relative overflow-hidden border-2 border-orange-400 bg-gradient-to-br from-orange-50 to-amber-50 shadow-lg">
         <p className="text-xs uppercase tracking-wide text-orange-700 font-semibold mb-2 text-center">
           Page 3 of {totalPages} · 🔒 Locked
         </p>
-        <p className="text-center text-sm font-semibold text-orange-900 mb-3 uppercase tracking-wide">
-          What happens next?
+        <p className="text-center text-base font-extrabold text-orange-900 mb-3 uppercase tracking-wider">
+          Continue the story…
         </p>
-        <p className="text-center text-lg text-gray-700 mb-4 italic blur-sm select-none">
+        <p className="text-center text-lg text-gray-800 mb-4 italic blur-md select-none">
           &ldquo;{storyTexts.p3}&rdquo;
         </p>
         <div className="mx-auto max-w-md relative">
-          <div className="aspect-square w-full rounded-xl bg-gradient-to-br from-orange-100 to-amber-200 flex items-center justify-center border border-orange-300 shadow-inner">
-            <div className="text-center px-6">
-              <div className="text-6xl mb-3">🔒</div>
-              <p className="text-base font-bold text-orange-900 mb-1">
-                The story is just getting started
+          <div className="aspect-square w-full rounded-xl bg-gradient-to-br from-gray-900 via-gray-800 to-orange-900 flex items-center justify-center border border-gray-900 shadow-2xl relative overflow-hidden">
+            {/* dark vignette */}
+            <div className="absolute inset-0 bg-black/40" />
+            <div className="relative text-center px-6">
+              <div className="text-7xl mb-3 drop-shadow-[0_4px_12px_rgba(255,150,0,0.6)]">🔒</div>
+              <p className="text-lg font-extrabold text-white mb-1 drop-shadow">
+                {childName}&apos;s adventure is just beginning
               </p>
-              <p className="text-sm text-orange-800">
-                Unlock {totalPages - 2} more pages of {childName}&apos;s adventure
+              <p className="text-sm text-orange-200">
+                {totalPages - 2} more pages locked
               </p>
             </div>
           </div>
         </div>
-        <p className="text-center text-xs text-orange-700 mt-4 font-medium">
+        <p className="text-center text-sm text-orange-800 mt-4 font-bold">
           ↓ Unlock below to see how it ends ↓
         </p>
       </div>
