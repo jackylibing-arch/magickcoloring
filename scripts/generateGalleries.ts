@@ -25,6 +25,26 @@ import { getGallery, saveGallery } from '../lib/galleryStore';
 const CONCURRENCY_PER_SLUG = 6; // images in flight for a single slug
 const SLUG_CONCURRENCY = 1;     // process N slugs in parallel (keep at 1 to be polite)
 
+// Site URL + token for on-demand ISR revalidation after each KV write.
+// Without this, pages stay on the "preparing" placeholder for 24h.
+const SITE_URL = process.env.SITE_URL || 'https://magickcoloring.com';
+const REVALIDATE_TOKEN = process.env.REVALIDATE_TOKEN;
+
+async function revalidateSlug(slug: string): Promise<void> {
+  if (!REVALIDATE_TOKEN) return; // silent skip if not configured
+  try {
+    const res = await fetch(`${SITE_URL}/api/revalidate-gallery?slug=${slug}`, {
+      method: 'POST',
+      headers: { 'x-revalidate-token': REVALIDATE_TOKEN },
+    });
+    if (!res.ok) {
+      console.warn(`  revalidate ${slug} -> ${res.status}`);
+    }
+  } catch (err: any) {
+    console.warn(`  revalidate ${slug} failed: ${err?.message || err}`);
+  }
+}
+
 function parseArgs() {
   const args = process.argv.slice(2);
   const out: { tier?: number; slug?: string; limit?: number; force?: boolean; dryRun?: boolean } = {};
@@ -128,6 +148,7 @@ async function main() {
         imageUrls: urls,
         generatedAt: Date.now(),
       });
+      await revalidateSlug(s.slug);
       const dt = ((Date.now() - start) / 1000).toFixed(1);
       done++;
       console.log(`[${done}/${work.length}] ${s.slug}  (${dt}s)`);
