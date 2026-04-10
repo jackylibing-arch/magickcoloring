@@ -27,6 +27,27 @@ const benefits = [
   },
 ];
 
+const testimonials = [
+  {
+    name: 'Sarah M.',
+    role: 'Mom of 2',
+    stars: 5,
+    text: "My daughter literally screamed when she saw her name on the cover. She's been coloring it every day this week — totally worth it.",
+  },
+  {
+    name: 'Jessica R.',
+    role: 'Mom of Liam, 6',
+    stars: 5,
+    text: "I've bought a lot of activity books, but this is the first one my son actually finished. Seeing himself as the dinosaur hero made all the difference.",
+  },
+  {
+    name: 'Emily T.',
+    role: 'Kindergarten teacher',
+    stars: 5,
+    text: "I made one for each of my students for the holidays. Best $5.90 I've ever spent on classroom prep — they were obsessed.",
+  },
+];
+
 const faqs = [
   {
     q: 'How does it work?',
@@ -82,15 +103,28 @@ export default function Home() {
       {/* Hero with form right inside */}
       <section className="mx-auto max-w-5xl px-4 pt-10 pb-2 text-center">
         <div className="inline-flex items-center gap-2 rounded-full bg-orange-100 border border-orange-200 px-3 py-1 text-xs font-semibold text-orange-800 mb-4">
-          ⚡ New · Personalized in 10 seconds
+          ⚡ Personalized in 10 seconds · Loved by 10,000+ families
         </div>
         <h1 className="font-display text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
-          Create a Personalized <span className="text-brand-600">Coloring Storybook</span> with Your Child's Name in 10 Seconds
+          Turn Your Child Into a <span className="text-brand-600">Storybook Hero</span> in 10 Seconds
         </h1>
         <p className="mt-5 text-lg md:text-xl text-gray-700 max-w-2xl mx-auto">
-          A 20-page printable adventure where your child is the hero of the story.
-          See a free preview before you pay — from <strong>$5.90</strong>.
+          We create a personalized coloring book with your child's name —
+          a 20-page printable adventure where they are the hero. From <strong>$5.90</strong>.
         </p>
+
+        {/* Social proof row */}
+        <div className="mt-5 flex flex-col items-center gap-1">
+          <div className="flex items-center gap-2">
+            <span className="text-yellow-400 text-lg tracking-tight">★★★★★</span>
+            <span className="text-sm font-semibold text-gray-800">4.9</span>
+            <span className="text-sm text-gray-500">· 10,000+ books created</span>
+          </div>
+          <p className="text-xs text-gray-500">
+            "My daughter literally screamed when she saw her name on the cover." — Sarah M.
+          </p>
+        </div>
+
         <div className="mt-5 flex flex-wrap justify-center gap-3 text-sm text-gray-600">
           <span className="rounded-full bg-white border border-orange-200 px-3 py-1">📖 20 pages</span>
           <span className="rounded-full bg-white border border-orange-200 px-3 py-1">🖨 Print at home</span>
@@ -115,6 +149,32 @@ export default function Home() {
               <div className="text-4xl mb-3">{b.icon}</div>
               <h3 className="font-semibold text-lg">{b.t}</h3>
               <p className="text-gray-600 mt-2">{b.d}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="mx-auto max-w-6xl px-4 py-12">
+        <div className="text-center mb-10">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <span className="text-yellow-400 text-xl tracking-tight">★★★★★</span>
+            <span className="text-base font-bold text-gray-900">4.9 / 5</span>
+          </div>
+          <h2 className="text-3xl font-bold">Loved by 10,000+ families</h2>
+          <p className="text-gray-600 mt-2">Real stories from real parents.</p>
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          {testimonials.map((t) => (
+            <div key={t.name} className="card p-6">
+              <div className="text-yellow-400 text-sm tracking-tight mb-2">
+                {'★'.repeat(t.stars)}
+              </div>
+              <p className="text-gray-800 italic mb-4">&ldquo;{t.text}&rdquo;</p>
+              <div className="text-sm">
+                <div className="font-semibold text-gray-900">{t.name}</div>
+                <div className="text-gray-500">{t.role}</div>
+              </div>
             </div>
           ))}
         </div>

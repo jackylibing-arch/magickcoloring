@@ -42,6 +42,15 @@ export default function BookCreator() {
   return (
     <section id="creator" className="mx-auto max-w-3xl px-4 py-8">
       <div className="card p-6 md:p-8">
+        <p className="text-center text-sm text-gray-500 mb-4">
+          👇 Try: <button
+            type="button"
+            onClick={() => { setChildName('Emma'); setAge(5); setTheme('princess'); }}
+            className="font-semibold text-brand-700 hover:text-brand-800 underline-offset-2 hover:underline"
+          >
+            Emma, age 5, princess theme
+          </button>
+        </p>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block text-sm font-semibold text-gray-800 mb-2">
