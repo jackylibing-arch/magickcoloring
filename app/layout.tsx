@@ -77,6 +77,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </a>
             <nav className="flex gap-5 text-sm font-medium text-gray-700">
               <a href="/" className="hover:text-brand-600">Create Book</a>
+              <a href="/coloring-pages" className="hover:text-brand-600">Coloring Pages</a>
               <a href="/free-tool" className="hover:text-brand-600">Free Tool</a>
               <a href="/blog" className="hover:text-brand-600">Blog</a>
             </nav>
@@ -89,6 +90,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-gray-600 flex flex-col md:flex-row md:justify-between gap-3">
             <div>© {new Date().getFullYear()} {SITE.name}. Built with ✨ for parents & teachers.</div>
             <div className="flex gap-4">
+              <a href="/coloring-pages" className="hover:text-brand-600">Coloring Pages</a>
               <a href="/blog" className="hover:text-brand-600">Blog</a>
               <a href="/sitemap.xml" className="hover:text-brand-600">Sitemap</a>
             </div>

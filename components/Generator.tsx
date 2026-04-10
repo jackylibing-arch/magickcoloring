@@ -1,12 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { STYLES, type StyleId, SITE } from '@/lib/site';
 
 type GenState = 'idle' | 'loading' | 'done' | 'error';
 
 export default function Generator() {
+  const searchParams = useSearchParams();
   const [prompt, setPrompt] = useState('');
+
+  // Pre-fill from ?prompt=... when arriving from /coloring-pages/[slug] CTA.
+  useEffect(() => {
+    const seed = searchParams.get('prompt');
+    if (seed && !prompt) setPrompt(seed);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
   const [style, setStyle] = useState<StyleId>('simple');
   const [state, setState] = useState<GenState>('idle');
   const [imageUrl, setImageUrl] = useState<string | null>(null);

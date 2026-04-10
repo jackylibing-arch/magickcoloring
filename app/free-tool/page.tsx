@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import Generator from '@/components/Generator';
 import { SITE } from '@/lib/site';
 
@@ -60,7 +61,9 @@ export default function FreeTool() {
         </div>
       </section>
 
-      <Generator />
+      <Suspense fallback={null}>
+        <Generator />
+      </Suspense>
 
       <section className="mx-auto max-w-3xl px-4 py-14">
         <h2 className="text-3xl font-bold text-center mb-10">FAQ</h2>
