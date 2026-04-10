@@ -8,6 +8,7 @@
 // images appear and swaps them in progressively.
 
 import { NextRequest, NextResponse } from 'next/server';
+import { waitUntil } from '@vercel/functions';
 import {
   generateStory,
   THEMES,
@@ -16,13 +17,15 @@ import {
 } from '@/lib/templates';
 import { saveBook, newBookId, type Book } from '@/lib/bookStore';
 import { isPromptSafe } from '@/lib/prompt';
-import { SITE } from '@/lib/site';
+import { generatePreviewForBook } from '@/lib/bookPreviewGen';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
 export const revalidate = 0;
-export const maxDuration = 10; // story generation only — instant
+// waitUntil work runs after the response, but still inside the lambda's
+// allotted maxDuration. Need ~25-30s budget for the 3 parallel fal.ai calls.
+export const maxDuration = 60;
 
 const VALID_THEMES = new Set(THEMES.map((t) => t.id));
 
@@ -69,11 +72,14 @@ export async function POST(req: NextRequest) {
 
   await saveBook(book);
 
-  // Fire-and-forget: kick off preview image generation. We don't await it
-  // so this endpoint returns instantly. The client will redirect and poll.
-  const origin = SITE.url;
-  fetch(`${origin}/api/book/${id}/generate-preview`, { method: 'POST' }).catch((e) =>
-    console.error('failed to kick off preview generation', e)
+  // Run preview image generation in the background, on this same lambda,
+  // *after* the response has been sent. waitUntil keeps the lambda alive
+  // until the promise settles (no killed-fetch race), and avoids the
+  // apex→www 308 redirect issue we'd get from an HTTP self-call.
+  waitUntil(
+    generatePreviewForBook(id).catch((e) =>
+      console.error('[create] background preview gen failed', id, e)
+    )
   );
 
   return NextResponse.json({

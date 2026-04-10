@@ -111,7 +111,15 @@ export default function BookPreviewImages({
         </p>
         <button
           type="button"
-          onClick={() => window.location.reload()}
+          onClick={async () => {
+            setErrored(false);
+            try {
+              await fetch(`/api/book/${bookId}/generate-preview`, { method: 'POST' });
+            } catch {
+              // ignore — polling effect will reattach on the new render
+            }
+            window.location.reload();
+          }}
           className="btn-primary"
         >
           Try again
