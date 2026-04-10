@@ -107,7 +107,7 @@ export default function BookCreator() {
             disabled={loading || !childName.trim()}
             className="btn-primary w-full text-lg py-4"
           >
-            {loading ? 'Creating your preview… (~15 seconds)' : '✨ Create Free Preview'}
+            {loading ? 'Creating your preview…' : '✨ Create Free Preview'}
           </button>
           <p className="text-center text-xs text-gray-500">
             Free 3-page preview · No signup · Unlock the full 20-page book for $5.90

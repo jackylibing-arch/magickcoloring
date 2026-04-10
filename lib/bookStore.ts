@@ -22,7 +22,7 @@ export type Book = {
   // Story
   story: StoryPage[];
   // Image URLs (parallel to story pages by index, plus index 0 = cover)
-  coverImageUrl: string;
+  coverImageUrl: string | null; // null until preview-generation finishes
   pageImageUrls: (string | null)[]; // length = story.length, null = not yet generated
   // Lifecycle
   status: BookStatus;
