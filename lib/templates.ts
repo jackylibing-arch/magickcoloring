@@ -51,7 +51,7 @@ const TEMPLATES: Record<Theme, Template> = {
       // 1: setup (free)
       { text: `Princess ${name} lived in a tall castle on top of a hill.`, scene: 'a tall fairytale castle on a hill with little flags' },
       // 2: TENSION (free) — sets up the cliffhanger
-      { text: `One morning, ${name} heard a strange tap-tap-tap at her window… something was outside.`, scene: 'a young princess looking nervously at a castle window, wide curious eyes, sparkles around the glass' },
+      { text: `One night, ${name} heard a STRANGE tap-tap-tap at her window… something was scratching to get IN.`, scene: 'a young princess in a dark bedroom looking nervously at a castle window, wide eyes, mysterious glow outside the glass' },
       // 3: CLIFFHANGER (locked) — the reveal
       { text: `A glowing letter floated through the window — and out flew a tiny dragon!`, scene: 'a small friendly dragon flying out of a glowing envelope, surprised princess watching' },
       // 4-19: adventure
@@ -82,7 +82,7 @@ const TEMPLATES: Record<Theme, Template> = {
       'a young child explorer in a safari hat standing next to a small friendly cartoon T-Rex, jungle leaves around them',
     pages: (name) => [
       { text: `${name} loved dinosaurs more than anything in the world.`, scene: 'a child lying on the floor playing with dinosaur toys' },
-      { text: `One day in the garden, ${name} found a glowing fossil — and it started to shake in her hands…`, scene: 'a child kneeling holding a glowing fossil with both hands, sparkles and tiny cracks on the surface' },
+      { text: `One day in the garden, ${name} found a glowing fossil — and it started to SHAKE violently in her hands…`, scene: 'a child kneeling, holding a brightly glowing fossil with both hands, sparkles flying off, tiny cracks spreading across the surface, alarmed expression' },
       // CLIFFHANGER
       { text: `The fossil cracked open — and a tiny dinosaur popped out, alive!`, scene: 'a tiny baby dinosaur hatching out of a cracked glowing egg, child gasping' },
       { text: `The little dinosaur was scared. ${name} hugged him gently.`, scene: 'a child gently hugging a small baby dinosaur' },
@@ -112,7 +112,7 @@ const TEMPLATES: Record<Theme, Template> = {
       'a young child astronaut in a space helmet standing on the moon, with planets and stars in the background',
     pages: (name) => [
       { text: `${name} loved looking up at the stars every night.`, scene: 'a child looking out a bedroom window at a night sky full of stars' },
-      { text: `One night, ${name}'s little toy rocket started to BEEP… then something inside it began to thump.`, scene: 'a small toy rocket on a desk glowing brightly, sparkles around it, child leaning in to listen' },
+      { text: `One night, ${name}'s toy rocket started to BEEP loudly — and something inside began to bang on the door.`, scene: 'a small glowing toy rocket on a desk shaking, sparkles flying off, child leaning in with wide curious eyes' },
       // CLIFFHANGER
       { text: `The rocket grew bigger… and a tiny door opened with someone inside!`, scene: 'a small rocket with an open hatch, a tiny alien peeking out, child amazed' },
       { text: `It was a tiny alien named Zip. He needed ${name}'s help!`, scene: 'a small friendly alien with three eyes waving hello' },
@@ -142,7 +142,7 @@ const TEMPLATES: Record<Theme, Template> = {
       'a young child standing next to a small friendly unicorn with a flowing mane, in a magical forest with sparkles',
     pages: (name) => [
       { text: `On her birthday, ${name} took a walk into the magical forest.`, scene: 'a child walking into a forest with sunlight beams shining down' },
-      { text: `She heard hooves galloping toward her from behind the trees… closer… and closer…`, scene: 'a child standing very still in a forest, looking nervously toward shaking bushes, glowing footprints on the ground' },
+      { text: `Suddenly she heard hooves THUNDERING toward her from behind the trees… closer… and closer…`, scene: 'a child standing very still in a deep forest, looking nervously over her shoulder at violently shaking bushes, glowing footprints leading toward her' },
       // CLIFFHANGER
       { text: `${name} looked up — and a real unicorn was right in front of her, but she looked SO sad.`, scene: 'a small sad unicorn with droopy ears, child looking surprised' },
       { text: `The unicorn was named Luna. She had lost her magic horn!`, scene: 'a small unicorn named Luna with a flat spot on her forehead' },
@@ -172,7 +172,7 @@ const TEMPLATES: Record<Theme, Template> = {
       'a young child wearing a snorkel mask swimming with a friendly dolphin under the sea, fish around them',
     pages: (name) => [
       { text: `${name} was building a sandcastle on a sunny beach.`, scene: 'a child building a sandcastle with a little bucket and shovel' },
-      { text: `Suddenly, a glowing seashell at her feet started to whisper her name…`, scene: 'a large glowing spiral seashell on the sand, child leaning down to listen, sparkles around it' },
+      { text: `Suddenly, a glowing seashell at her feet whispered her name… and the waves started to RISE.`, scene: 'a large glowing spiral seashell on the sand, child stepping back with surprised eyes, big rising waves behind her, sparkles in the air' },
       // CLIFFHANGER
       { text: `A tiny voice called her name — and a little hand reached up from the waves!`, scene: 'a small mermaid hand reaching out of ocean waves, child surprised on the sand' },
       { text: `It was a tiny mermaid named Pearl. Her grandma's crown was missing!`, scene: 'a small friendly mermaid with long hair waving hello' },

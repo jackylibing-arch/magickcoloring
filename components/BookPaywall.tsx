@@ -38,8 +38,11 @@ export default function BookPaywall({
 
   return (
     <div className="card p-8 bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-orange-200">
+      <p className="text-center text-sm font-bold uppercase tracking-wider text-orange-700 mb-2">
+        Continue {childName}&apos;s adventure
+      </p>
       <h2 className="text-2xl md:text-3xl font-extrabold text-center mb-2">
-        Unlock {childName}&apos;s Storybook
+        Unlock {childName}&apos;s Full Storybook
       </h2>
       <p className="text-center text-gray-700 mb-6">
         See how {childName}&apos;s adventure ends.
