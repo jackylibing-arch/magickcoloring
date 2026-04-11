@@ -37,13 +37,16 @@ export async function generateColoringImage(fullPrompt: string): Promise<string>
 
 // Build the full coloring-book-style prompt from a scene fragment.
 // Optimised for kids' coloring books: thick outlines, no shading.
+// Aggressively repels dark/solid-black backgrounds — FLUX schnell otherwise
+// honours "dark cave / night sky" literally and outputs pitch-black images.
 export function buildBookPagePrompt(scene: string): string {
   return [
     `Coloring book page of ${scene.trim()}.`,
-    'Pure black and white line art only. No shading, no grayscale, no color.',
-    'Thick bold outlines, very simple shapes, large areas to color.',
-    'White background. Crisp clean black outlines. High contrast.',
-    'Centered composition, full subject visible.',
+    'Pure black-and-white line art only. No shading, no grayscale, no color fills.',
+    'Thick bold black outlines on a plain white background.',
+    'Absolutely no solid black areas, no dark fills, no shaded regions.',
+    'Large empty white areas for kids to color in.',
+    'Simple shapes, centered composition, full subject clearly visible.',
     "Children's coloring book style, suitable for ages 3-8.",
     'No text, no watermark, no signature.',
   ].join(' ');
