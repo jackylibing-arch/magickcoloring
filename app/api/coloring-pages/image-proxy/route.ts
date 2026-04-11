@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const ALLOWED_HOSTNAME = /^(v\d+\.)?fal\.media$/;
+const ALLOWED_HOSTNAME = /^([a-z0-9]+\.)?fal\.media$/;
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
