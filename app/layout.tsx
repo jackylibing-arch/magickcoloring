@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import './globals.css';
 import { SITE } from '@/lib/site';
+import NavBar from '@/components/NavBar';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -18,7 +19,6 @@ export const metadata: Metadata = {
     'ai line art',
     'custom coloring book',
   ],
-  alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
     url: SITE.url,
@@ -70,19 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
       </head>
       <body className="min-h-screen flex flex-col">
-        <header className="border-b border-orange-100 bg-white/80 backdrop-blur sticky top-0 z-30">
-          <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
-            <a href="/" className="font-display text-xl font-extrabold text-brand-700">
-              ✨ {SITE.name}
-            </a>
-            <nav className="flex gap-5 text-sm font-medium text-gray-700">
-              <a href="/" className="hover:text-brand-600">Create Book</a>
-              <a href="/coloring-pages" className="hover:text-brand-600">Coloring Pages</a>
-              <a href="/free-tool" className="hover:text-brand-600">Free Tool</a>
-              <a href="/blog" className="hover:text-brand-600">Blog</a>
-            </nav>
-          </div>
-        </header>
+        <NavBar />
 
         <main className="flex-1">{children}</main>
 

@@ -12,7 +12,7 @@
 // client can show "N remaining today" in the UI, but the cookie is *not* the
 // source of truth for limiting — KV is.
 
-import { kv } from '@vercel/kv';
+import { redis } from './redis';
 import { cookies } from 'next/headers';
 import { SITE } from './site';
 
@@ -20,12 +20,12 @@ export type Bucket = 'gen' | 'book';
 
 // Per-day quota per bucket.
 // gen  = 3 images/IP/day × $0.003 = $0.009/IP/day (direct fal.ai bleed)
-// book = 5 books/IP/day. Thanks to the per-theme asset cache, the fal.ai
-//        cost per book is ~$0 once warm; this quota is only to keep KV
-//        from being filled with junk preview books.
+// book = 50 books/IP/day. Per-theme assets are pre-generated & cached —
+//        every preview after the first hit is $0 fal.ai cost. Quota is
+//        here only as an anti-bot cap; junk previews auto-expire in 24h.
 const QUOTAS: Record<Bucket, number> = {
   gen: SITE.freeDailyLimit, // 3 (see lib/site.ts)
-  book: 5,
+  book: 50,
 };
 
 function todayKey(): string {
@@ -52,7 +52,7 @@ export function getQuota(bucket: Bucket): number {
 // Used by the client-facing "remaining" indicator.
 export async function getUsage(bucket: Bucket, ip: string): Promise<number> {
   try {
-    const v = await kv.get<number>(kvKey(bucket, ip));
+    const v = await redis.get<number>(kvKey(bucket, ip));
     return typeof v === 'number' ? v : 0;
   } catch (err) {
     console.error('[rateLimit] getUsage failed', err);
@@ -71,10 +71,10 @@ export async function checkAndBump(
   const key = kvKey(bucket, ip);
   try {
     // Atomic incr — returns new value.
-    const count = await kv.incr(key);
+    const count = await redis.incr(key);
     if (count === 1) {
       // First hit today for this IP — set expiry so it self-cleans.
-      await kv.expire(key, 60 * 60 * 26);
+      await redis.expire(key, 60 * 60 * 26);
     }
     if (count > quota) {
       return { allowed: false, count: count - 1, remaining: 0 };

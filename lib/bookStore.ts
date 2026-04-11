@@ -3,7 +3,7 @@
 // without KV env vars silently used a private in-memory Map, causing
 // per-lambda state divergence in production. Fail loud instead.
 
-import { kv } from '@vercel/kv';
+import { redis } from './redis';
 import type { Theme, StoryPage } from './templates';
 
 export type BookStatus =
@@ -46,12 +46,12 @@ export async function saveBook(book: Book): Promise<void> {
   // Unpaid previews expire in 24h (cheap cleanup for abandoned/abusive flows).
   // Once paid, extend to 30 days so the customer can re-download their PDF.
   const ttlSeconds = book.paid ? 60 * 60 * 24 * 30 : 60 * 60 * 24;
-  await kv.set(KV_PREFIX + book.id, book, { ex: ttlSeconds });
+  await redis.set(KV_PREFIX + book.id, book, { ex: ttlSeconds });
 }
 
 export async function getBook(id: string): Promise<Book | null> {
   assertKv();
-  return (await kv.get<Book>(KV_PREFIX + id)) ?? null;
+  return (await redis.get<Book>(KV_PREFIX + id)) ?? null;
 }
 
 export async function updateBook(

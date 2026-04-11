@@ -150,10 +150,8 @@ export default async function ColoringPagesSlug({
                   loading={i < 4 ? 'eager' : 'lazy'}
                 />
                 <a
-                  href={url}
+                  href={`/api/coloring-pages/image-proxy?url=${encodeURIComponent(url)}&filename=${slug.slug}-${i + 1}.png`}
                   download={`${slug.slug}-${i + 1}.png`}
-                  target="_blank"
-                  rel="noopener"
                   className="mt-3 block text-center rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold py-2"
                 >
                   ⬇ Download

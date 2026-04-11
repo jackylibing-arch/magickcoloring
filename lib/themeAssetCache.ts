@@ -16,7 +16,7 @@
 // bookPreviewGen (so the first-ever book for a theme still populates
 // the cache, even if we forgot to run the batch).
 
-import { kv } from '@vercel/kv';
+import { redis } from './redis';
 import type { Theme } from './templates';
 
 const PREFIX = 'theme-asset:';
@@ -36,7 +36,7 @@ function kvConfigured(): boolean {
 export async function getCachedCover(theme: Theme): Promise<string | null> {
   if (!kvConfigured()) return null;
   try {
-    return (await kv.get<string>(coverKey(theme))) ?? null;
+    return (await redis.get<string>(coverKey(theme))) ?? null;
   } catch (err) {
     console.error('[themeAssetCache] getCachedCover failed', theme, err);
     return null;
@@ -46,7 +46,7 @@ export async function getCachedCover(theme: Theme): Promise<string | null> {
 export async function getCachedPage(theme: Theme, i: number): Promise<string | null> {
   if (!kvConfigured()) return null;
   try {
-    return (await kv.get<string>(pageKey(theme, i))) ?? null;
+    return (await redis.get<string>(pageKey(theme, i))) ?? null;
   } catch (err) {
     console.error('[themeAssetCache] getCachedPage failed', theme, i, err);
     return null;
@@ -56,10 +56,10 @@ export async function getCachedPage(theme: Theme, i: number): Promise<string | n
 export async function setCachedCover(theme: Theme, url: string): Promise<void> {
   if (!kvConfigured()) return;
   // No TTL — these are permanent assets.
-  await kv.set(coverKey(theme), url);
+  await redis.set(coverKey(theme), url);
 }
 
 export async function setCachedPage(theme: Theme, i: number, url: string): Promise<void> {
   if (!kvConfigured()) return;
-  await kv.set(pageKey(theme, i), url);
+  await redis.set(pageKey(theme, i), url);
 }
