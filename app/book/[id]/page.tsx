@@ -4,6 +4,7 @@ import { getBook } from '@/lib/bookStore';
 import { getBookTitle } from '@/lib/templates';
 import BookPaywall from '@/components/BookPaywall';
 import BookPreviewImages from '@/components/BookPreviewImages';
+import StickyCheckoutBar from '@/components/StickyCheckoutBar';
 
 export const dynamic = 'force-dynamic';
 
@@ -96,20 +97,7 @@ export default async function BookPreviewPage({ params }: { params: { id: string
         <BookPaywall bookId={book.id} childName={book.childName} totalPages={totalPages} />
       </div>
 
-      {/* Sticky bottom CTA — always visible */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-orange-200 bg-white/95 backdrop-blur-sm shadow-2xl">
-        <a href="#unlock-cta" className="block px-4 py-3 max-w-3xl mx-auto">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex flex-col flex-shrink-0">
-              <span className="text-xs text-gray-500 line-through leading-none">$12.00</span>
-              <span className="text-lg font-extrabold text-brand-700 leading-tight">$5.90</span>
-            </div>
-            <span className="flex-1 text-center rounded-xl bg-gradient-to-r from-orange-500 to-brand-600 text-white font-bold py-3 px-4 text-sm md:text-base shadow-lg">
-              🎨 Unlock {book.childName}&apos;s Storybook
-            </span>
-          </div>
-        </a>
-      </div>
+      <StickyCheckoutBar bookId={book.id} childName={book.childName} />
     </div>
   );
 }
