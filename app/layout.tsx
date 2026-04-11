@@ -35,6 +35,11 @@ export const metadata: Metadata = {
   },
   robots: { index: true, follow: true },
   icons: { icon: '/favicon.ico' },
+  verification: {
+    other: {
+      'p:domain_verify': '7f0346162efa87b9211e15edec562f10',
+    },
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
