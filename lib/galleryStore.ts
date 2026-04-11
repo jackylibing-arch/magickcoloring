@@ -3,6 +3,7 @@
 // Read by /coloring-pages/[slug] at request time (cached by Next.js).
 
 import { redis } from './redis';
+import { COLORING_SLUGS } from './coloringSlugs';
 
 const KV_PREFIX = 'gallery:';
 
@@ -20,14 +21,34 @@ function kvConfigured(): boolean {
 // Read is tolerant: if KV isn't configured (e.g. local build without env)
 // or the read errors, return null so the page can render a placeholder.
 // Only the batch script does writes, and it asserts hard.
+//
+// At build time Next.js renders all 199 slugs in parallel. A naive
+// `redis.get` per slug serializes ~199 round trips to Upstash → 10+ min
+// builds. We batch on first call: one `mget` pulls every gallery, later
+// getGallery() calls hit the in-memory map.
+let bulkPromise: Promise<Map<string, Gallery>> | null = null;
+
+async function loadAllGalleries(): Promise<Map<string, Gallery>> {
+  const map = new Map<string, Gallery>();
+  if (!kvConfigured()) return map;
+  try {
+    const keys = COLORING_SLUGS.map((s) => KV_PREFIX + s.slug);
+    const values = await redis.mget<Gallery[]>(...keys);
+    COLORING_SLUGS.forEach((s, i) => {
+      const v = values[i];
+      if (v) map.set(s.slug, v);
+    });
+  } catch (err) {
+    console.error('[gallery] bulk read failed', err);
+  }
+  return map;
+}
+
 export async function getGallery(slug: string): Promise<Gallery | null> {
   if (!kvConfigured()) return null;
-  try {
-    return (await redis.get<Gallery>(KV_PREFIX + slug)) ?? null;
-  } catch (err) {
-    console.error('[gallery] read failed', slug, err);
-    return null;
-  }
+  if (!bulkPromise) bulkPromise = loadAllGalleries();
+  const map = await bulkPromise;
+  return map.get(slug) ?? null;
 }
 
 export async function saveGallery(g: Gallery): Promise<void> {
