@@ -18,12 +18,14 @@ import { SITE } from './site';
 
 export type Bucket = 'gen' | 'book';
 
-// Per-day quota per bucket. Tuned to cap worst-case cost per abusive IP.
-// gen  = 3 images/IP/day × $0.003 = $0.009/IP/day
-// book = 1 book/IP/day × 3 img × $0.003 = $0.009/IP/day
+// Per-day quota per bucket.
+// gen  = 3 images/IP/day × $0.003 = $0.009/IP/day (direct fal.ai bleed)
+// book = 5 books/IP/day. Thanks to the per-theme asset cache, the fal.ai
+//        cost per book is ~$0 once warm; this quota is only to keep KV
+//        from being filled with junk preview books.
 const QUOTAS: Record<Bucket, number> = {
   gen: SITE.freeDailyLimit, // 3 (see lib/site.ts)
-  book: 1,
+  book: 5,
 };
 
 function todayKey(): string {

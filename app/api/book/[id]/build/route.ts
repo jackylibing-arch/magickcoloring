@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getBook, updateBook } from '@/lib/bookStore';
 import { generateColoringImage, buildBookPagePrompt } from '@/lib/falImage';
+import { getCachedPage, setCachedPage } from '@/lib/themeAssetCache';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -36,14 +37,19 @@ export async function POST(_req: NextRequest, { params }: { params: { id: string
       .map((u, i) => (u === null ? i : -1))
       .filter((i) => i >= 0);
 
+    // For each missing page, try the theme asset cache first. Only hit fal.ai
+    // on cache miss, and write back so the next purchase of this theme is free.
     const CONCURRENCY = 6;
     const generated: { i: number; url: string }[] = [];
     for (let start = 0; start < missingIndices.length; start += CONCURRENCY) {
       const batch = missingIndices.slice(start, start + CONCURRENCY);
       const batchResults = await Promise.all(
         batch.map(async (i) => {
+          const cached = await getCachedPage(book.theme, i);
+          if (cached) return { i, url: cached };
           const prompt = buildBookPagePrompt(book.story[i].scene);
           const url = await generateColoringImage(prompt);
+          await setCachedPage(book.theme, i, url);
           return { i, url };
         })
       );

@@ -4,10 +4,21 @@
 //     in the background but on the same lambda instance — no HTTP self-call,
 //     no apex/www redirect issue, no killed-fetch issue)
 //   - /api/book/[id]/generate-preview (manual retry endpoint for the client)
+//
+// IMPORTANT: Since fal.ai image prompts don't embed the child's name, the
+// cover + page 1/2 images are identical across all users who pick the same
+// theme. We cache them per-theme in KV (see lib/themeAssetCache.ts). This
+// drops per-book fal.ai cost to ~$0 once the cache is warm.
 
 import { getBook, updateBook } from './bookStore';
 import { generateColoringImage, buildBookPagePrompt } from './falImage';
 import { getCoverScene } from './templates';
+import {
+  getCachedCover,
+  getCachedPage,
+  setCachedCover,
+  setCachedPage,
+} from './themeAssetCache';
 
 export async function generatePreviewForBook(bookId: string): Promise<void> {
   const book = await getBook(bookId);
@@ -22,15 +33,45 @@ export async function generatePreviewForBook(bookId: string): Promise<void> {
   }
 
   try {
-    const coverPrompt = buildBookPagePrompt(getCoverScene(book.theme, book.childName));
-    const page1Prompt = buildBookPagePrompt(book.story[0].scene);
-    const page2Prompt = buildBookPagePrompt(book.story[1].scene);
-
-    const [coverUrl, page1Url, page2Url] = await Promise.all([
-      generateColoringImage(coverPrompt),
-      generateColoringImage(page1Prompt),
-      generateColoringImage(page2Prompt),
+    // Parallel cache lookups.
+    const [cachedCover, cachedP0, cachedP1] = await Promise.all([
+      getCachedCover(book.theme),
+      getCachedPage(book.theme, 0),
+      getCachedPage(book.theme, 1),
     ]);
+
+    // Cover — cache or generate.
+    const coverUrl =
+      cachedCover ??
+      (await (async () => {
+        const url = await generateColoringImage(
+          buildBookPagePrompt(getCoverScene(book.theme, book.childName))
+        );
+        await setCachedCover(book.theme, url);
+        return url;
+      })());
+
+    // Page 0 (story page 1) — cache or generate.
+    const page1Url =
+      cachedP0 ??
+      (await (async () => {
+        const url = await generateColoringImage(
+          buildBookPagePrompt(book.story[0].scene)
+        );
+        await setCachedPage(book.theme, 0, url);
+        return url;
+      })());
+
+    // Page 1 (story page 2) — cache or generate.
+    const page2Url =
+      cachedP1 ??
+      (await (async () => {
+        const url = await generateColoringImage(
+          buildBookPagePrompt(book.story[1].scene)
+        );
+        await setCachedPage(book.theme, 1, url);
+        return url;
+      })());
 
     const updatedImageUrls = [...book.pageImageUrls];
     updatedImageUrls[0] = page1Url;
