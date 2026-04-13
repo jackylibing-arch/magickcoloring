@@ -2,6 +2,7 @@
 // One KV entry per slug, holding the list of fal.ai image URLs.
 // Read by /coloring-pages/[slug] at request time (cached by Next.js).
 
+import { unstable_cache } from 'next/cache';
 import { redis } from './redis';
 import { COLORING_SLUGS } from './coloringSlugs';
 
@@ -26,29 +27,47 @@ function kvConfigured(): boolean {
 // `redis.get` per slug serializes ~199 round trips to Upstash → 10+ min
 // builds. We batch on first call: one `mget` pulls every gallery, later
 // getGallery() calls hit the in-memory map.
-let bulkPromise: Promise<Map<string, Gallery>> | null = null;
+let bulkPromise: Promise<Record<string, Gallery>> | null = null;
 
-async function loadAllGalleries(): Promise<Map<string, Gallery>> {
-  const map = new Map<string, Gallery>();
-  if (!kvConfigured()) return map;
-  try {
-    const keys = COLORING_SLUGS.map((s) => KV_PREFIX + s.slug);
-    const values = await redis.mget<Gallery[]>(...keys);
-    COLORING_SLUGS.forEach((s, i) => {
-      const v = values[i];
-      if (v) map.set(s.slug, v);
-    });
-  } catch (err) {
-    console.error('[gallery] bulk read failed', err);
+async function loadAllGalleriesRaw(): Promise<Record<string, Gallery>> {
+  const out: Record<string, Gallery> = {};
+  if (!kvConfigured()) {
+    console.warn('[gallery] KV not configured at build/runtime');
+    return out;
   }
-  return map;
+  const CHUNK = 50;
+  for (let i = 0; i < COLORING_SLUGS.length; i += CHUNK) {
+    const slice = COLORING_SLUGS.slice(i, i + CHUNK);
+    const keys = slice.map((s) => KV_PREFIX + s.slug);
+    const values = (await redis.mget<(Gallery | null)[]>(...keys)) as (
+      | Gallery
+      | null
+    )[];
+    slice.forEach((s, j) => {
+      const v = values[j];
+      if (v) out[s.slug] = v;
+    });
+  }
+  console.log(
+    `[gallery] loaded ${Object.keys(out).length}/${COLORING_SLUGS.length} galleries`
+  );
+  return out;
 }
+
+// `unstable_cache` lets us call Upstash (which uses no-store fetch internally)
+// during static generation. Without this wrapper Next.js throws "Dynamic
+// server usage: no-store fetch" and the page falls back to an empty render.
+const loadAllGalleriesCached = unstable_cache(
+  loadAllGalleriesRaw,
+  ['all-galleries'],
+  { revalidate: 3600, tags: ['galleries'] }
+);
 
 export async function getGallery(slug: string): Promise<Gallery | null> {
   if (!kvConfigured()) return null;
-  if (!bulkPromise) bulkPromise = loadAllGalleries();
-  const map = await bulkPromise;
-  return map.get(slug) ?? null;
+  if (!bulkPromise) bulkPromise = loadAllGalleriesCached();
+  const all = await bulkPromise;
+  return all[slug] ?? null;
 }
 
 export async function saveGallery(g: Gallery): Promise<void> {
